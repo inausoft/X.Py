@@ -1,0 +1,1 @@
+export const X_PY_API_ADDRESS = "http://localhost:52030"
