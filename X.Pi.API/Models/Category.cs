@@ -8,7 +8,9 @@ namespace X.Pi.API.Models
     public enum Category
     {
         DataBase,
+
         FromPMWithLove,
+
         WarmUp
     }
 }

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using X.Pi.API.Models;
 using X.Pi.API.Services;
 using X.Pi.API.Services.Interfaces;
@@ -14,20 +11,13 @@ namespace X.Pi.API.Controllers
     [ApiController]
     public class QuizController : ControllerBase
     {
-        private readonly Services.Game _quizService;
+        private readonly QuizService _quizService;
         private readonly IPlayerService _playerService;
 
-        public QuizController(Services.Game quizService, IPlayerService playerService)
+        public QuizController(QuizService quizService, IPlayerService playerService)
         {
             _quizService = quizService;
             _playerService = playerService;
-        }
-
-        [HttpPost]
-        public bool Register([FromBody] Quiz quiz)
-        {
-
-            return true;
         }
 
         [HttpPost]
@@ -39,29 +29,36 @@ namespace X.Pi.API.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public Guid AddQuiz([FromBody] Quiz quiz)
+        public Guid AddQuiz([FromBody] QuizSource quiz)
         {
-            _quizService.Quizes.Add(quiz);
+            //_quizService.Quizes.Add(quiz);
 
             return quiz.Id;
         }
 
 
         [HttpGet("{id}")]
-        public Models.Game Get(Guid id)
+        public Quiz Get(Guid id)
         {
-            Models.Game game = new Models.Game();
-            game.Player = _playerService.GetPlayer(id);
-            game.ActiveQuestion = _quizService.ActiveQuestion;
-            game.State = _quizService.State;
+            Quiz quiz = new Quiz();
+            quiz.Player = _playerService.GetPlayer(id);
+            quiz.ActiveQuestion = _quizService.ActiveQuestion;
+            quiz.State = _quizService.State;
 
-            return game;
+            return quiz;
         }
 
-        [HttpGet]
-        public List<Quiz> Get()
+        //[HttpGet]
+        //public List<Quiz> Get()
+        //{
+        //    return _quizService.Quizes;
+        //}
+
+        [HttpPost]
+        [Route("[action]")]
+        public AnswerRecord Answer([FromBody] AnswerRequest request)
         {
-            return _quizService.Quizes;
+            return _quizService.ValidateRespond(request.PlayerToken, request.AnswerId).Last();
         }
     }
 }

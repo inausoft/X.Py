@@ -96,7 +96,7 @@ class GameView extends Component {
     }
 
     sendAnswerRequest = (answerId) => {
-        axios.post(consts.X_PY_API_ADDRESS + "/api/players/answer",
+        axios.post(consts.X_PY_API_ADDRESS + "/api/quiz/answer",
         { 
             playerToken : this.props.match.params.id,
             answerId : answerId

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace X.Pi.API.Models
 {
@@ -20,6 +18,7 @@ namespace X.Pi.API.Models
         public Question()
         {
             QuestionId = Guid.NewGuid();
+
             Answers = new List<Answer>();
         }
     }
@@ -47,6 +46,7 @@ namespace X.Pi.API.Models
                 Text = Text,
             };
             question.Answers.Add(new Answer(1, CorrectAnswer));
+
             for(int i = 0; i< PossibleAnswers.Count; i++)
             {
                 question.Answers.Add(new Answer(i + 2, PossibleAnswers[i]));

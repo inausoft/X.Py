@@ -9,13 +9,9 @@ namespace X.Pi.API.Services
 {
     public class InMemoryPlayerService : IPlayerService
     {
-        [Obsolete]
         public int ActiveConnectionsCount { get; set; }
-        public int RegistratedPlayerCount { get; set; }
 
         public List<Player> Players { get; set; }
-
-        public IEnumerable<Player> participants => Players;
 
         public InMemoryPlayerService()
         {
@@ -34,6 +30,11 @@ namespace X.Pi.API.Services
         public Player GetPlayer(Guid id)
         {
             return Players.First(x => x.Id == id);
+        }
+
+        public IEnumerable<Player> GetAllPlayers()
+        {
+            return Players;
         }
     }
 }

@@ -5,11 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="RegisterResponse.cs" />
+    <Compile Remove="wwwroot\**" />
+    <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="wwwroot\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <Compile Remove="RegisterResponse.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -7,40 +7,12 @@ namespace X.Pi.API.Models
 {
     public class Quiz
     {
-        public string Name { get; set; }
+        public QuizState State { get; set; }
 
-        public List<QuizQuestion> QuizQuestions { get; set; }
+        public Question ActiveQuestion { get; set; }
 
-        public Guid Id { get; internal set; }
+        public Player Player { get; set; }
 
-        public Quiz()
-        {
-            Id = Guid.NewGuid();
-            QuizQuestions = new List<QuizQuestion>();
-        }
-
-        public static Quiz CreateTestQuiz()
-        {
-            var quiz = new Quiz();
-            quiz.Name = "Test Quiz";
-
-            quiz.QuizQuestions.Add(new QuizQuestion()
-            {
-                Category = Category.WarmUp,
-                Text = "Test tex question 1??",
-                CorrectAnswer = "Correct Answer",
-                PossibleAnswers = {"dsda", "dasdasad"}
-            });
-
-            quiz.QuizQuestions.Add(new QuizQuestion()
-            {
-                Category = Category.WarmUp,
-                Text = "Jak nazywal sie pies myszki Mickey",
-                CorrectAnswer = "Pluto",
-                PossibleAnswers = { "Azor", "Rex" }
-            });
-
-            return quiz;
-        }
+        public TimeSpan TimeLeft { get; set; }
     }
 }

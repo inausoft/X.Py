@@ -8,6 +8,7 @@ namespace X.Pi.API.Models
     public class Player
     {
         internal Guid Id { get; private set; }
+
         public string Nickname { get; private set; }
 
         public int Score
@@ -20,6 +21,7 @@ namespace X.Pi.API.Models
         public Player(Guid id, string name)
         {
             Id = id;
+
             Nickname = name;
 
             answersHistory = new List<AnswerRecord>();

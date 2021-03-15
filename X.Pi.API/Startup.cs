@@ -33,18 +33,16 @@ namespace X.Pi.API
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSingleton<IQuestionsService>(new InMemoryQuestionsService());
-            services.AddSingleton<Game>();
+            services.AddSingleton<QuizService>();
             services.AddSingleton<IPlayerService>(new InMemoryPlayerService());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddCors();
             services.AddSignalR();
-            services.ConfigurateHealthChecks();
 
 
             services.AddSwaggerGen(c =>
             {
-                
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
 
