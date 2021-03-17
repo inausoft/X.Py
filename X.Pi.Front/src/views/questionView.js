@@ -42,8 +42,8 @@ class QuestionView extends Component {
    renderAnswer = (answer) => {
       let style = JSON.parse(JSON.stringify(AnswerStyle));
         
-      if(this.props.selectedAnswer != null){
-         if(this.props.selectedAnswer.answerId == answer.id){
+      if(this.props.answerId != null){
+         if(this.props.answerId == answer.id){
             style.color = "#ddd";
             style.backgroundColor = "#8b56f4";
          }

@@ -7,35 +7,35 @@ using X.Pi.API.Models;
 using Microsoft.AspNetCore.SignalR;
 using X.Pi.API.Controllers;
 using X.Pi.API.Hubs;
-using X.Pi.API.Services.Interfaces;
 
 namespace X.Pi.API.Services
 {
-    public class QuizService
+    public class GameService
     {
-        private readonly IHubContext<QuizHub> hubContext;
+        private readonly IHubContext<QuizHub> _hubContext;
 
-        public QuizSource ActiveQuiz { get; private set; }
+        public Quiz ActiveQuiz { get; private set; }
 
         public Question ActiveQuestion { get; set; }
 
+        public Game ActiveGame { get; set; }
+
         private TimeSpan TimeLeft { get; set; }
 
-        public QuizState State { get; set; }
+        public GameState State { get; set; }
 
         protected int CurrentQuestion { get; set; }
 
-        public readonly IPlayerService playerService;
 
         Timer timer;
 
-        public QuizService(IHubContext<QuizHub> hubContext, IPlayerService playerService)
+        public GameService(IHubContext<QuizHub> hubContext)
         {
-            this.hubContext = hubContext;
+            _hubContext = hubContext;
 
-            State = QuizState.NotScheduled;
+            ActiveGame = new Game();
 
-            this.playerService = playerService;
+            State = GameState.NotScheduled;
 
             timer = new Timer(1000);
             timer.Start();
@@ -43,14 +43,25 @@ namespace X.Pi.API.Services
             timer.Elapsed += UpdateQuizState;
         }
 
+        public Guid RegisterPlayer(string name)
+        {
+            Guid playerToken = Guid.NewGuid();
+
+            ActiveGame.Players.Add(new Player(playerToken, name));
+
+            _hubContext.Clients.All.SendAsync("PlayersCountChnaged", ActiveGame.Players.Count);
+
+            return playerToken;
+        }
+
         public void StartQuiz()
         {
-            ActiveQuiz = QuizSource.CreateTestQuiz();
+            ActiveQuiz = Quiz.CreateTestQuiz();
 
-            State = QuizState.WaitingForStart;
+            State = GameState.WaitingForStart;
             CurrentQuestion = 0;
 
-            TimeLeft = TimeSpan.FromMinutes(1);
+            TimeLeft = TimeSpan.FromSeconds(30);
         }
 
         private void UpdateQuizState(object sender, ElapsedEventArgs e)
@@ -66,17 +77,17 @@ namespace X.Pi.API.Services
             }
             else
             {
-                if (State == QuizState.WaitingForStart)
+                if (State == GameState.WaitingForStart)
                 {
-                    State = QuizState.QuestionAsked;
+                    State = GameState.QuestionAsked;
                     ActiveQuestion = ActiveQuiz.QuizQuestions[0].CreateQuestion();
                     TimeLeft = TimeSpan.FromSeconds(10);
                 }
-                else if (State == QuizState.QuestionAsked)
+                else if (State == GameState.QuestionAsked)
                 {
-                    State = QuizState.QuestionResults;
+                    State = GameState.QuestionResults;
 
-                    foreach (var player in playerService.GetAllPlayers())
+                    foreach (var player in ActiveGame.Players)
                     {
                         var answer = player.answersHistory.FirstOrDefault(x => x.QuestionId == ActiveQuestion.QuestionId);
 
@@ -93,30 +104,30 @@ namespace X.Pi.API.Services
 
                     TimeLeft = TimeSpan.FromSeconds(10);
                 }
-                else if (State == QuizState.QuestionResults)
+                else if (State == GameState.QuestionResults)
                 {
                     if (CurrentQuestion < ActiveQuiz.QuizQuestions.Count - 1)
                     {
-                        State = QuizState.QuestionAsked;
+                        State = GameState.QuestionAsked;
                         CurrentQuestion++;
                         ActiveQuestion = ActiveQuiz.QuizQuestions[CurrentQuestion].CreateQuestion();
                         TimeLeft = TimeSpan.FromSeconds(10);
                     }
                     else
                     {
-                        State = QuizState.QuizResults;
+                        State = GameState.QuizResults;
                     }
                 }
             }
 
-            hubContext.Clients.All.SendAsync("UpdateQuizState", new GameNotification(State, TimeLeft));
+            _hubContext.Clients.All.SendAsync("UpdateQuizState", new GameNotification(State, TimeLeft));
         }
 
         public List<AnswerRecord> ValidateRespond(Guid playerId, int answerId)
         {
-            var player = playerService.GetPlayer(playerId);
+            var player = ActiveGame.Players.FirstOrDefault(it => it.Id == playerId);
 
-            if (State == QuizState.QuestionAsked)
+            if (State == GameState.QuestionAsked)
             {
                 if (!player.answersHistory.Any(x => x.QuestionId == ActiveQuestion.QuestionId))
                 {

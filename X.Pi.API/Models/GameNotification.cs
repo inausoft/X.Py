@@ -9,12 +9,12 @@ namespace X.Pi.API.Models
     public class GameNotification
     {
         [JsonProperty("state")]
-        QuizState State { get; set; }
+        GameState State { get; set; }
 
         [JsonProperty("timeLeft")]
         string TimeLeft { get; set; }
 
-        public GameNotification(QuizState state, TimeSpan timeLeft)
+        public GameNotification(GameState state, TimeSpan timeLeft)
         {
             State = state;
             if(timeLeft != null)

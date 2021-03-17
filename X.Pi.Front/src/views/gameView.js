@@ -35,7 +35,7 @@ class GameView extends Component {
    }
 
    updateGameState = () => {
-      axios.get(consts.X_PY_API_ADDRESS + '/api/quiz/' + this.props.match.params.id)
+      axios.get(consts.X_PY_API_ADDRESS + '/api/game/' + this.props.match.params.id)
          .then(res => {
             this.setState({ 
                player: res.data.player,
@@ -68,7 +68,7 @@ class GameView extends Component {
             if(gameState != this.state.gameState){
 
                 if(this.state.gameState != 3){
-                    axios.get(consts.X_PY_API_ADDRESS + "/api/quiz/" + this.props.match.params.id)
+                    axios.get(consts.X_PY_API_ADDRESS + "/api/game/" + this.props.match.params.id)
                     .then(res => {
                         this.setState({ 
                             player: res.data.player,
@@ -82,7 +82,7 @@ class GameView extends Component {
                     });
                 }
                 else if(this.state.gameState == 3){
-                    axios.get(consts.X_PY_API_ADDRESS + "/api/players/")
+                    axios.get(consts.X_PY_API_ADDRESS + "/api/game/")
                     .then(res => {
                         this.setState({ 
                             standings: res.data,
@@ -96,15 +96,15 @@ class GameView extends Component {
     }
 
     sendAnswerRequest = (answerId) => {
-        axios.post(consts.X_PY_API_ADDRESS + "/api/quiz/answer",
+        axios.post(consts.X_PY_API_ADDRESS + "/api/game/answer",
         { 
             playerToken : this.props.match.params.id,
             answerId : answerId
         })
         .then(res => {
-            this.setState({ 
-                LastAnswerRecord : res.data
-            });
+             this.setState({ 
+                 LastAnswerRecord : answerId //res.data
+             });
         })
     }
 
@@ -121,7 +121,7 @@ class GameView extends Component {
          return (
             <div>
                <Timer time={this.state.timeLeft}/>
-               <QuestionView question={this.state.activeQuestion} callback={this.sendAnswerRequest} selectedAnswer={this.state.LastAnswerRecord}/>
+               <QuestionView question={this.state.activeQuestion} callback={this.sendAnswerRequest} answerId={this.state.LastAnswerRecord}/>
             </div>
          )
       }

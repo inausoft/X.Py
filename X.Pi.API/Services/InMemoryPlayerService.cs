@@ -1,40 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using X.Pi.API.Models;
-using X.Pi.API.Services.Interfaces;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Threading.Tasks;
+//using X.Pi.API.Models;
+//using X.Pi.API.Services.Interfaces;
 
-namespace X.Pi.API.Services
-{
-    public class InMemoryPlayerService : IPlayerService
-    {
-        public int ActiveConnectionsCount { get; set; }
+//namespace X.Pi.API.Services
+//{
+//    public class InMemoryPlayerService : IPlayerService
+//    {
+//        public int ActiveConnectionsCount { get; set; }
 
-        public List<Player> Players { get; set; }
+//        public List<Player> Players { get; set; }
 
-        public InMemoryPlayerService()
-        {
-            Players = new List<Player>();
-        }
+//        public InMemoryPlayerService()
+//        {
+//            Players = new List<Player>();
+//        }
 
-        public Guid RegisterPlayer(string name)
-        {
-            Guid playerToken = Guid.NewGuid();
+//        public Guid RegisterPlayer(string name)
+//        {
+//            Guid playerToken = Guid.NewGuid();
 
-            Players.Add(new Player(playerToken, name));
+//            Players.Add(new Player(playerToken, name));
 
-            return playerToken;
-        }
+//            return playerToken;
+//        }
 
-        public Player GetPlayer(Guid id)
-        {
-            return Players.First(x => x.Id == id);
-        }
+//        public Player GetPlayer(Guid id)
+//        {
+//            return Players.First(x => x.Id == id);
+//        }
 
-        public IEnumerable<Player> GetAllPlayers()
-        {
-            return Players;
-        }
-    }
-}
+//        public IEnumerable<Player> GetAllPlayers()
+//        {
+//            return Players;
+//        }
+//    }
+//}

@@ -1,6 +1,6 @@
 ﻿namespace X.Pi.API.Models
 {
-    public enum QuizState
+    public enum GameState
     {
         WaitingForStart,
         QuestionAsked,
