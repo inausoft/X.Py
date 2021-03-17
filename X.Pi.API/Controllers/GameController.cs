@@ -1,11 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using X.Pi.API.Hubs;
 using X.Pi.API.Models;
 using X.Pi.API.Services;
 
@@ -15,12 +11,10 @@ namespace X.Pi.API.Controllers
     [ApiController]
     public class GameController : ControllerBase
     {
-        //private readonly IPlayerService _playerService;
         private readonly GameService _gameService;
 
         public GameController(GameService gameService)
         {
-            //_playerService = playerService ?? throw new ArgumentNullException(nameof(playerService));
             _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
         }
 
@@ -43,9 +37,9 @@ namespace X.Pi.API.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public void StartQuiz()
+        public void StartGame()
         {
-            _gameService.StartQuiz();
+            _gameService.StartGame();
         }
 
         [HttpPost]
@@ -53,18 +47,13 @@ namespace X.Pi.API.Controllers
         public Game Answer([FromBody] AnswerRequest request)
         {
             _gameService.ValidateRespond(request.PlayerToken, request.AnswerId).Last();
-            return new Game();
+            return _gameService.ActiveGame;
         }
 
         [HttpGet("{id}")]
         public Game Get(Guid id)
         {
-            Game quiz = new Game();
-            quiz.Player = _gameService.ActiveGame.Players.FirstOrDefault(it => it.Id == id);
-            quiz.ActiveQuestion = _gameService.ActiveQuestion;
-            quiz.State = _gameService.State;
-
-            return quiz;
+            return _gameService.ActiveGame;
         }
     }
 }

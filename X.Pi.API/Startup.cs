@@ -31,7 +31,6 @@ namespace X.Pi.API
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddSingleton<IQuestionsService>(new InMemoryQuestionsService());
             services.AddSingleton<GameService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

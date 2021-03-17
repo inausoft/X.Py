@@ -14,15 +14,9 @@ namespace X.Pi.API.Services
     {
         private readonly IHubContext<QuizHub> _hubContext;
 
-        public Quiz ActiveQuiz { get; private set; }
-
-        public Question ActiveQuestion { get; set; }
-
         public Game ActiveGame { get; set; }
 
         private TimeSpan TimeLeft { get; set; }
-
-        public GameState State { get; set; }
 
         protected int CurrentQuestion { get; set; }
 
@@ -35,7 +29,7 @@ namespace X.Pi.API.Services
 
             ActiveGame = new Game();
 
-            State = GameState.NotScheduled;
+            ActiveGame.State = GameState.NotScheduled;
 
             timer = new Timer(1000);
             timer.Start();
@@ -54,11 +48,11 @@ namespace X.Pi.API.Services
             return playerToken;
         }
 
-        public void StartQuiz()
+        public void StartGame()
         {
-            ActiveQuiz = Quiz.CreateTestQuiz();
+            ActiveGame.Quiz = Quiz.CreateTestQuiz();
 
-            State = GameState.WaitingForStart;
+            ActiveGame.State = GameState.WaitingForStart;
             CurrentQuestion = 0;
 
             TimeLeft = TimeSpan.FromSeconds(30);
@@ -66,7 +60,7 @@ namespace X.Pi.API.Services
 
         private void UpdateQuizState(object sender, ElapsedEventArgs e)
         {
-            if(ActiveQuiz == null)
+            if(ActiveGame.Quiz == null)
             {
                 return;
             }
@@ -77,62 +71,62 @@ namespace X.Pi.API.Services
             }
             else
             {
-                if (State == GameState.WaitingForStart)
+                if (ActiveGame.State == GameState.WaitingForStart)
                 {
-                    State = GameState.QuestionAsked;
-                    ActiveQuestion = ActiveQuiz.QuizQuestions[0].CreateQuestion();
+                    ActiveGame.State = GameState.QuestionAsked;
+                    ActiveGame.ActiveQuestion = ActiveGame.Quiz.QuizQuestions[0].CreateQuestion();
                     TimeLeft = TimeSpan.FromSeconds(10);
                 }
-                else if (State == GameState.QuestionAsked)
+                else if (ActiveGame.State == GameState.QuestionAsked)
                 {
-                    State = GameState.QuestionResults;
+                    ActiveGame.State = GameState.QuestionResults;
 
                     foreach (var player in ActiveGame.Players)
                     {
-                        var answer = player.answersHistory.FirstOrDefault(x => x.QuestionId == ActiveQuestion.QuestionId);
+                        var answer = player.answersHistory.FirstOrDefault(x => x.QuestionId == ActiveGame.ActiveQuestion.QuestionId);
 
                         if (answer == null)
                         {
-                            answer = new AnswerRecord(ActiveQuestion.QuestionId, 0);
+                            answer = new AnswerRecord(ActiveGame.ActiveQuestion.QuestionId, 0);
                             player.answersHistory.Add(answer);
                         }
 
-                        answer.IsCorrect = answer.AnswerId == ActiveQuestion.CorrectAnswerId;
+                        answer.IsCorrect = answer.AnswerId == ActiveGame.ActiveQuestion.CorrectAnswerId;
                     }
 
-                    ActiveQuestion.Answers.First(x => x.Id == ActiveQuestion.CorrectAnswerId).IsCorrect = true;
+                    ActiveGame.ActiveQuestion.Answers.First(x => x.Id == ActiveGame.ActiveQuestion.CorrectAnswerId).IsCorrect = true;
 
                     TimeLeft = TimeSpan.FromSeconds(10);
                 }
-                else if (State == GameState.QuestionResults)
+                else if (ActiveGame.State == GameState.QuestionResults)
                 {
-                    if (CurrentQuestion < ActiveQuiz.QuizQuestions.Count - 1)
+                    if (CurrentQuestion < ActiveGame.Quiz.QuizQuestions.Count - 1)
                     {
-                        State = GameState.QuestionAsked;
+                        ActiveGame.State = GameState.QuestionAsked;
                         CurrentQuestion++;
-                        ActiveQuestion = ActiveQuiz.QuizQuestions[CurrentQuestion].CreateQuestion();
+                        ActiveGame.ActiveQuestion = ActiveGame.Quiz.QuizQuestions[CurrentQuestion].CreateQuestion();
                         TimeLeft = TimeSpan.FromSeconds(10);
                     }
                     else
                     {
-                        State = GameState.QuizResults;
+                        ActiveGame.State = GameState.QuizResults;
                     }
                 }
             }
 
-            _hubContext.Clients.All.SendAsync("UpdateQuizState", new GameNotification(State, TimeLeft));
+            _hubContext.Clients.All.SendAsync("UpdateQuizState", new GameNotification(ActiveGame.State, TimeLeft));
         }
 
         public List<AnswerRecord> ValidateRespond(Guid playerId, int answerId)
         {
             var player = ActiveGame.Players.FirstOrDefault(it => it.Id == playerId);
 
-            if (State == GameState.QuestionAsked)
+            if (ActiveGame.State == GameState.QuestionAsked)
             {
-                if (!player.answersHistory.Any(x => x.QuestionId == ActiveQuestion.QuestionId))
+                if (!player.answersHistory.Any(x => x.QuestionId == ActiveGame.ActiveQuestion.QuestionId))
                 {
-                    player.answersHistory.Add(new AnswerRecord(ActiveQuestion.QuestionId, answerId));
-                    ActiveQuestion.Answers.First(x => x.Id == answerId).responsesCount++;
+                    player.answersHistory.Add(new AnswerRecord(ActiveGame.ActiveQuestion.QuestionId, answerId));
+                    ActiveGame.ActiveQuestion.Answers.First(x => x.Id == answerId).responsesCount++;
                 }
             }
             return player.answersHistory;

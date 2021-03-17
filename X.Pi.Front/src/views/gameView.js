@@ -38,7 +38,8 @@ class GameView extends Component {
       axios.get(consts.X_PY_API_ADDRESS + '/api/game/' + this.props.match.params.id)
          .then(res => {
             this.setState({ 
-               player: res.data.player,
+               player: res.data.players.find(it => it.id === this.props.match.params.id),
+               playersCount: res.data.players.length,
                activeQuestion: res.data.activeQuestion,
                gameState : res.data.state 
             });
@@ -71,7 +72,8 @@ class GameView extends Component {
                     axios.get(consts.X_PY_API_ADDRESS + "/api/game/" + this.props.match.params.id)
                     .then(res => {
                         this.setState({ 
-                            player: res.data.player,
+                           player: res.data.players.find(it => it.id === this.props.match.params.id),
+                            playersCount: res.data.players.length,
                             activeQuestion: res.data.activeQuestion,
                         });
                         if(this.state.gameState == 1){
@@ -102,9 +104,12 @@ class GameView extends Component {
             answerId : answerId
         })
         .then(res => {
-             this.setState({ 
-                 LastAnswerRecord : answerId //res.data
-             });
+           if(this.state.LastAnswerRecord === null){
+            this.setState({ 
+               LastAnswerRecord : answerId //res.data
+            });
+           }
+             
         })
     }
 
