@@ -32,7 +32,6 @@ namespace X.Pi.API
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSingleton<GameService>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddCors();
             services.AddSignalR();

@@ -39,6 +39,7 @@ class GameView extends Component {
          .then(res => {
             this.setState({ 
                player: res.data.players.find(it => it.id === this.props.match.params.id),
+               players : res.data.players,
                playersCount: res.data.players.length,
                activeQuestion: res.data.activeQuestion,
                gameState : res.data.state 
@@ -72,6 +73,7 @@ class GameView extends Component {
                     axios.get(consts.X_PY_API_ADDRESS + "/api/game/" + this.props.match.params.id)
                     .then(res => {
                         this.setState({ 
+                           players : res.data.players,
                            player: res.data.players.find(it => it.id === this.props.match.params.id),
                             playersCount: res.data.players.length,
                             activeQuestion: res.data.activeQuestion,
@@ -81,14 +83,6 @@ class GameView extends Component {
                             LastAnswerRecord: null
                             });
                         }
-                    });
-                }
-                else if(this.state.gameState == 3){
-                    axios.get(consts.X_PY_API_ADDRESS + "/api/game/")
-                    .then(res => {
-                        this.setState({ 
-                            standings: res.data,
-                        });
                     });
                 }
             }
@@ -133,9 +127,9 @@ class GameView extends Component {
       else if(this.state.gameState === 4){
          return <div style={TextStyle} > Czekamy na quiz </div>
       }
-      else if(this.state.gameState === 3 && this.state.standings != null){
+      else if(this.state.gameState === 3){
          return(
-                <Standings players={this.state.standings}/>
+                <Standings players={this.state.players.sort((a,b) => b.score - a.score)}/>
               );
       }
       else{

@@ -18,12 +18,6 @@ namespace X.Pi.API.Controllers
             _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
         }
 
-        [HttpGet]
-        public List<Player> GetStandings()
-        {
-            return _gameService.ActiveGame.Players.OrderByDescending(x => x.Score).Take(3).ToList();
-        }
-
         [HttpPost]
         public RegisterResponse Register([FromBody] RegisterRequest request)
         {
