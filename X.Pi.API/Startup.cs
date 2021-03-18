@@ -14,7 +14,6 @@ using Microsoft.OpenApi.Models;
 using X.Pi.API.Controllers;
 using X.Pi.API.Hubs;
 using X.Pi.API.Services;
-using X.Pi.API.Services.Interfaces;
 
 namespace X.Pi.API
 {
@@ -32,10 +31,7 @@ namespace X.Pi.API
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddSingleton<IQuestionsService>(new InMemoryQuestionsService());
-            services.AddSingleton<QuizService>();
-            services.AddSingleton<IPlayerService>(new InMemoryPlayerService());
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<GameService>();
 
             services.AddCors();
             services.AddSignalR();
@@ -59,7 +55,7 @@ namespace X.Pi.API
             app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().WithExposedHeaders("content-disposition")
             .AllowAnyHeader()
             .AllowCredentials()
-            .SetPreflightMaxAge(TimeSpan.FromSeconds(3600)));
+            .SetPreflightMaxAge(TimeSpan.FromSeconds(36000)));
 
             app.UseMvc();
 

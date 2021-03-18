@@ -35,10 +35,12 @@ class GameView extends Component {
    }
 
    updateGameState = () => {
-      axios.get(consts.X_PY_API_ADDRESS + '/api/quiz/' + this.props.match.params.id)
+      axios.get(consts.X_PY_API_ADDRESS + '/api/game/' + this.props.match.params.id)
          .then(res => {
             this.setState({ 
-               player: res.data.player,
+               player: res.data.players.find(it => it.id === this.props.match.params.id),
+               players : res.data.players,
+               playersCount: res.data.players.length,
                activeQuestion: res.data.activeQuestion,
                gameState : res.data.state 
             });
@@ -68,10 +70,12 @@ class GameView extends Component {
             if(gameState != this.state.gameState){
 
                 if(this.state.gameState != 3){
-                    axios.get(consts.X_PY_API_ADDRESS + "/api/quiz/" + this.props.match.params.id)
+                    axios.get(consts.X_PY_API_ADDRESS + "/api/game/" + this.props.match.params.id)
                     .then(res => {
                         this.setState({ 
-                            player: res.data.player,
+                           players : res.data.players,
+                           player: res.data.players.find(it => it.id === this.props.match.params.id),
+                            playersCount: res.data.players.length,
                             activeQuestion: res.data.activeQuestion,
                         });
                         if(this.state.gameState == 1){
@@ -81,14 +85,6 @@ class GameView extends Component {
                         }
                     });
                 }
-                else if(this.state.gameState == 3){
-                    axios.get(consts.X_PY_API_ADDRESS + "/api/players/")
-                    .then(res => {
-                        this.setState({ 
-                            standings: res.data,
-                        });
-                    });
-                }
             }
         });
 
@@ -96,15 +92,18 @@ class GameView extends Component {
     }
 
     sendAnswerRequest = (answerId) => {
-        axios.post(consts.X_PY_API_ADDRESS + "/api/quiz/answer",
+        axios.post(consts.X_PY_API_ADDRESS + "/api/game/answer",
         { 
             playerToken : this.props.match.params.id,
             answerId : answerId
         })
         .then(res => {
+           if(this.state.LastAnswerRecord === null){
             this.setState({ 
-                LastAnswerRecord : res.data
+               LastAnswerRecord : answerId //res.data
             });
+           }
+             
         })
     }
 
@@ -121,16 +120,16 @@ class GameView extends Component {
          return (
             <div>
                <Timer time={this.state.timeLeft}/>
-               <QuestionView question={this.state.activeQuestion} callback={this.sendAnswerRequest} selectedAnswer={this.state.LastAnswerRecord}/>
+               <QuestionView question={this.state.activeQuestion} callback={this.sendAnswerRequest} answerId={this.state.LastAnswerRecord}/>
             </div>
          )
       }
       else if(this.state.gameState === 4){
          return <div style={TextStyle} > Czekamy na quiz </div>
       }
-      else if(this.state.gameState === 3 && this.state.standings != null){
+      else if(this.state.gameState === 3){
          return(
-                <Standings players={this.state.standings}/>
+                <Standings players={this.state.players.sort((a,b) => b.score - a.score)}/>
               );
       }
       else{

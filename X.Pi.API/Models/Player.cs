@@ -7,7 +7,7 @@ namespace X.Pi.API.Models
 {
     public class Player
     {
-        internal Guid Id { get; private set; }
+        public Guid Id { get; private set; }
 
         public string Nickname { get; private set; }
 

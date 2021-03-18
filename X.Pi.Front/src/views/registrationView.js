@@ -22,7 +22,7 @@ class RegistrationView extends Component {
         return (
             <div>
                 <div>
-                    <input class="App-input App-input-general" autoComplete="off" 
+                    <input class="App-input App-input-general" autoComplete="false" 
                            onChange={event => this.updateName(event.target.value)} type="text" name="name"/>
                 </div>
                 <div>

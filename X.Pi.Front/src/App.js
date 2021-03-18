@@ -29,12 +29,11 @@ class App extends Component {
     });
 
     connection.start()
-    .then(() => connection.invoke("RegisterMe"))
-    .catch(err => console.log('Error while establishing connection :('));
+    .catch(err => console.log('Error while establishing connection :(' + err));
   }
 
   register = (value) => {
-    axios.post(consts.X_PY_API_ADDRESS + "/api/players/",
+    axios.post(consts.X_PY_API_ADDRESS + "/api/game/",
       { name: value }
     ).then(res => {
           this.setState({ id: res.data.token });
